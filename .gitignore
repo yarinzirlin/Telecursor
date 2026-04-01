@@ -1,0 +1,19 @@
+# Build artifacts
+Telecursor_bin
+Telecursor.app/
+.build/
+*.o
+*.d
+*.swp
+
+# Xcode
+Telecursor.xcodeproj/
+xcuserdata/
+*.xcworkspace
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Toolchain workaround
+vfs_overlay.yaml

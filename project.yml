@@ -1,0 +1,25 @@
+name: Telecursor
+options:
+  bundleIdPrefix: com.telecursor
+  deploymentTarget:
+    macOS: "14.0"
+  generateEmptyDirectories: true
+targets:
+  Telecursor:
+    type: application
+    platform: macOS
+    sources:
+      - path: Telecursor
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.telecursor.app
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_FILE: Telecursor/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Telecursor/Telecursor.entitlements
+        SWIFT_VERSION: "5.9"
+        ENABLE_HARDENED_RUNTIME: false
+        PRODUCT_NAME: Telecursor
