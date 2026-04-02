@@ -1,7 +1,15 @@
 import CoreGraphics
 
+@_silgen_name("_CGSDefaultConnection")
+private func _CGSDefaultConnection() -> UInt32
+
+@_silgen_name("CGSSetCursorScale")
+private func CGSSetCursorScale(_ connection: UInt32, _ scale: Float)
+
 final class CursorManager {
     private var lastPositions: [CGDirectDisplayID: CGPoint] = [:]
+    private let connection = _CGSDefaultConnection()
+    var pulseDuration: Double = 0.6
 
     private func currentDisplayID() -> CGDirectDisplayID? {
         guard let event = CGEvent(source: nil) else { return nil }
@@ -47,6 +55,34 @@ final class CursorManager {
             target = CGPoint(x: bounds.midX, y: bounds.midY)
         }
         CGWarpMouseCursorPosition(target)
+        pulseCursor()
+    }
+
+    private func pulseCursor() {
+        let conn = connection
+        let duration = pulseDuration
+        DispatchQueue.global(qos: .userInteractive).async {
+            let peakScale: Float = 4.0
+            let rampUpTime = 0.07
+            let rampDownTime = max(duration - rampUpTime, 0.05)
+            let rampUp = max(Int(rampUpTime / 0.012), 1)
+            let rampDown = max(Int(rampDownTime / 0.012), 1)
+            let upDelay = UInt32(rampUpTime / Double(rampUp) * 1_000_000)
+            let downDelay = UInt32(rampDownTime / Double(rampDown) * 1_000_000)
+
+            for i in 0...rampUp {
+                let t = Float(i) / Float(rampUp)
+                CGSSetCursorScale(conn, 1.0 + (peakScale - 1.0) * t)
+                usleep(upDelay)
+            }
+            for i in 0...rampDown {
+                let t = Float(i) / Float(rampDown)
+                let ease = t * t
+                CGSSetCursorScale(conn, peakScale - (peakScale - 1.0) * ease)
+                usleep(downDelay)
+            }
+            CGSSetCursorScale(conn, 1.0)
+        }
     }
 
     func cycleScreen(forward: Bool) {

@@ -37,6 +37,16 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Cursor Pulse") {
+                HStack {
+                    Text("Duration")
+                    Slider(value: $appState.pulseDuration, in: 0.1...2.0, step: 0.1)
+                    Text(String(format: "%.1fs", appState.pulseDuration))
+                        .monospacedDigit()
+                        .frame(width: 35)
+                }
+            }
+
             Section("Accessibility") {
                 HStack {
                     Image(systemName: appState.accessibilityGranted
@@ -55,7 +65,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 400, height: 280)
+        .frame(width: 400, height: 340)
     }
 
     private var loginItemBinding: Binding<Bool> {

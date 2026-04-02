@@ -30,6 +30,13 @@ final class AppState: NSObject, ObservableObject, NSWindowDelegate {
     @Published var recordingTarget: RecordingTarget = .none
     @Published var accessibilityGranted = false
 
+    @Published var pulseDuration: Double {
+        didSet {
+            UserDefaults.standard.set(pulseDuration, forKey: "pulseDuration")
+            cursorManager.pulseDuration = pulseDuration
+        }
+    }
+
     let hotkeyManager = HotkeyManager()
     let cursorManager = CursorManager()
     private var settingsWindow: NSWindow?
@@ -39,6 +46,7 @@ final class AppState: NSObject, ObservableObject, NSWindowDelegate {
         isEnabled = UserDefaults.standard.object(forKey: "isEnabled") as? Bool ?? true
         forwardHotkey = Self.loadHotkey(key: "forwardHotkey") ?? .defaultForward
         reverseHotkey = Self.loadHotkey(key: "reverseHotkey") ?? .defaultReverse
+        pulseDuration = UserDefaults.standard.object(forKey: "pulseDuration") as? Double ?? 0.6
     }
 
     func start() {
@@ -51,6 +59,7 @@ final class AppState: NSObject, ObservableObject, NSWindowDelegate {
         hotkeyManager.onReverseHotkey = { [weak self] in
             self?.cursorManager.cycleScreen(forward: false)
         }
+        cursorManager.pulseDuration = pulseDuration
         hotkeyManager.start()
         checkAccessibility()
 
